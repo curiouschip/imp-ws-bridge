@@ -1,14 +1,4 @@
-IMP Bridge
-----------
-
-[ ] accept multiple TCP connections on specified TCP port
-[ ] open named serial port
-[ ] interrogate device + dump to console
-[ ] proxy requests/replies (serial encoding, correlation, sequence rewriting)
-[ ] init scripts
-[ ] IMP documentation
-
-Future
-------
-
-[ ] auto detection (enumerate serial ports)
+[ ] start up mongoose
+[ ] accept websocket connection
+[ ] websocket request/response - echo
+[ ] serial comms - serial buffer echo test on linux
