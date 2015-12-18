@@ -26,10 +26,10 @@ not_found:
 }
 
 void web_end_request(const struct mg_connection *conn, int reply_status_code) {
-	DLOG("request ended");
+	DLOG("(web) request ended");
 	struct mg_request_info *req = mg_get_request_info((struct mg_connection*)conn);
 	if (req->conn_data) {
-		DLOG("freeing connection data");
+		DLOG("(web) freeing connection data");
 		free(req->conn_data);
 	}
 }
@@ -39,11 +39,12 @@ int web_ws_connect(const struct mg_connection *conn) {
 	struct client_state *state;
 	state = malloc(sizeof(struct client_state) + WEB_RESPONSE_BUFFER_SIZE);
 	if (state == 0) {
-		DLOG("couldn't allocate memory for client");
+		DLOG("(web) couldn't allocate memory for client");
 		return 1;
 	} else {
 		state->response_buffer_sz = WEB_RESPONSE_BUFFER_SIZE;	
 		req->conn_data = state;
+		DLOG("(web) new connection");
 		return 0;
 	}
 }
@@ -51,6 +52,7 @@ int web_ws_connect(const struct mg_connection *conn) {
 int web_ws_data(struct mg_connection *conn, int bits, char *data, size_t data_len) {
 	int opcode = bits & 0x0F;
 	if (opcode == WEBSOCKET_OPCODE_BINARY) {
+		DLOG("(web) %zu bytes received", data_len);
 		struct mg_request_info *req = mg_get_request_info(conn);
 		struct client_state *state = (struct client_state*)req->conn_data;
 		int response_len = imp_request(data, data_len, state->response_buffer, state->response_buffer_sz);
@@ -58,12 +60,13 @@ int web_ws_data(struct mg_connection *conn, int bits, char *data, size_t data_le
 			// TODO: send error
 		} else {
 			mg_websocket_write(conn, WEBSOCKET_OPCODE_BINARY, state->response_buffer, response_len);
+			DLOG("(web) %d bytes sent", response_len);
 		}
 	} else if (opcode == WEBSOCKET_OPCODE_PING) {
-		DLOG("ping!");
+		DLOG("(web) ping!");
 		mg_websocket_write(conn, WEBSOCKET_OPCODE_PONG, NULL, 0);
 	} else {
- 		WARN("non-binary data received, ignored");
+ 		WARN("(web) non-binary data received, ignored");
  	}
 	return 1;
 }

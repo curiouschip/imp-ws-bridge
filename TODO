@@ -1,4 +1,3 @@
-[ ] start up mongoose
-[ ] accept websocket connection
-[ ] websocket request/response - echo
-[ ] serial comms - serial buffer echo test on linux
+# Improvements
+
+[ ] serial port should be non-blocking
